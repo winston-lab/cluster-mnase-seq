@@ -1,0 +1,5 @@
+.snakemake/
+mogrify.log
+figures/
+*.bed
+config.yaml
