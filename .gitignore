@@ -3,3 +3,4 @@ mogrify.log
 figures/
 *.bed
 config.yaml
+Rplots.pdf

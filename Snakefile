@@ -31,6 +31,7 @@ rule cluster_mnase_data:
         left_limit = config["left_limit"],
         right_limit = config["right_limit"],
         epochs = config["epochs"]
+    conda: "envs/cluster_mnase.yaml"
     script:
         "scripts/cluster_mnase.R"
 
