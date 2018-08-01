@@ -1,0 +1,13 @@
+
+mnase_data: ../mnase-seq-publication/datavis/spt6-1004-induced-intragenic-TSS/spikenorm/spt6-1004-induced-intragenic-TSS-allsamples-allannotations-midpoint-spikenorm.tsv.gz
+annotation: ../tss-seq-publication/diff_exp/spt6-1004-37C-v-WT-37C/spikenorm/intragenic/spt6-1004-37C-v-WT-37C_tss-seq-spikenorm-diffexp-results-intragenic-up-summits.bed
+
+samples:
+    - WT-37C-1
+    - spt6-1004-37C-1
+    - spt6-1004-37C-2
+
+left_limit: -0.15
+right_limit: 0.15
+epochs: 200
+
