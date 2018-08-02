@@ -318,9 +318,10 @@ main = function(mnase_data, annotation, sample_list, som_width, som_height, left
 }
 
 #NOTE: I set a random seed for the SOM training so we can reproduce the clusters, however the results
-# are more or less stable under repeated training runs with different random seeds. For some runs,
+# are more or less stable under repeated training runs with different random seeds. For many runs,
 # a third, very small cluster will be generated which has a strong positioning pattern, but this third
-# cluster can always be grouped into one of the primary clusters based on its phasing pattern
+# cluster can always be grouped into one of the primary clusters based on its phasing pattern.
+# I did not have the time or energy to figure out better clustering...
 main(mnase_data = snakemake@input[["mnase_data"]],
      annotation = snakemake@input[["annotation"]],
      sample_list = snakemake@params[["sample_list"]],
@@ -331,7 +332,7 @@ main(mnase_data = snakemake@input[["mnase_data"]],
      epochs = snakemake@params[["epochs"]],
      n_clusters = 2,
      outputs = snakemake@output[["annotations"]],
-     seed = 812627,
+     seed = 755466,
      loss_out = snakemake@output[["loss_plot"]],
      dendrogram_out = snakemake@output[["dendrogram"]],
      code_vector_plot_out = snakemake@output[["code_vectors"]],
