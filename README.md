@@ -3,7 +3,7 @@
 
 ## description
 
-Code used to cluster *spt6-1004* intragenic TSSs based on the surrounding MNase-seq signal, as described in [our preprint](https://www.biorxiv.org/content/early/2018/06/15/347575). To reproduce the clustering exactly as in the publication, use the archived version of this analysis from [Zenodo](https://doi.org/10.5281/zenodo.1325930).
+Code used to cluster *spt6-1004* intragenic TSSs based on the surrounding MNase-seq signal, as described in [our preprint](https://doi.org/10.1101/347575). To reproduce the clustering exactly as in the publication, use the archived version of this analysis from [Zenodo](https://doi.org/10.5281/zenodo.1325930).
 
 ## requirements
 
