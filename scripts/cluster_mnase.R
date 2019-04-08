@@ -13,7 +13,11 @@ theme_default = theme_light() +
 
 build_som_input = function(df, condition, left, right){
     df %>%
-        filter(group == condition & between(position, left, right)) %>%
+        filter(between(position, left, right)) %>%
+        group_by(index) %>%
+        mutate(signal = (signal-mean(signal))/sd(signal)) %>%
+        filter(group == condition) %>%
+        ungroup() %>%
         spread(position, signal) %>%
         select(-c(group, index)) %>%
         as.matrix() %>%
@@ -32,7 +36,7 @@ get_codes_df = function(results, condition="WT"){
 
 
 main = function(mnase_data, annotation, sample_list, som_width, som_height, left_limit, right_limit,
-                epochs, n_clusters, outputs, seed,
+                epochs, n_clusters, outputs, meta_data_out, seed,
                 loss_out, dendrogram_out, code_vector_plot_out, data_by_unit_plot_out,
                 data_by_unit_and_cluster_plot_out, data_by_cluster_plot_out, data_by_cluster_group_plot_out,
                 heatmap_out){
@@ -125,7 +129,8 @@ main = function(mnase_data, annotation, sample_list, som_width, som_height, left
         geom_rect(data = unit_numbers_df,
                   aes(alpha=n),
                   xmin=left_limit, xmax=right_limit,
-                  ymin=0, ymax=max(codes_df[["signal"]])*1.05,
+                  ymin=min(codes_df[["signal"]])*1.05,
+                  ymax=max(codes_df[["signal"]])*1.05,
                   fill="grey") +
         geom_text(data = unit_numbers_df,
                   aes(label = n),
@@ -141,7 +146,7 @@ main = function(mnase_data, annotation, sample_list, som_width, som_height, left
                            labels = function(x)if_else(x==0, "TSS", as.character(x))) +
         scale_y_continuous(expand = c(0,0),
                            breaks = scales::pretty_breaks(n=2),
-                           name = "normalized counts") +
+                           name = "standard scores") +
         scale_alpha(guide=FALSE) +
         facet_wrap(~unit, ncol=som_width) +
         scale_color_ptol() +
@@ -166,7 +171,8 @@ main = function(mnase_data, annotation, sample_list, som_width, som_height, left
                   n = n()) %>%
         ungroup() %>%
         mutate(group = ordered(group, levels = c("WT-37C", "spt6-1004-37C"),
-                               labels = c("WT", "spt6-1004")))
+                               labels = c("WT", "spt6-1004"))) %>%
+        write_tsv(meta_data_out)
 
     data_by_unit_plot = ggplot() +
         geom_rect(data = unit_numbers_df,
@@ -261,7 +267,6 @@ main = function(mnase_data, annotation, sample_list, som_width, som_height, left
         theme(legend.title = element_blank())
     ggsave(data_by_cluster_plot_out, plot=data_by_cluster_plot, width=16, height=8, units="cm")
 
-
     data_by_cluster_group_plot = ggplot(data = meta_cluster_df,
            aes(x=position, ymin=low, ymax=high, y=mid,
                group = interaction(group, cluster),
@@ -283,13 +288,13 @@ main = function(mnase_data, annotation, sample_list, som_width, som_height, left
     ggsave(data_by_cluster_group_plot_out, data_by_cluster_group_plot, width=16, height=8, units="cm")
 
     #plot heatmap
-    df = som_classifications %>%
+    df_heatmap = som_classifications %>%
         group_by(cluster) %>%
         arrange(unit, index) %>%
         mutate(new_index = row_number()) %>%
         left_join(df, by="index")
 
-    heatmap = ggplot(data = df, aes(x=position, y=new_index, fill=signal)) +
+    heatmap = ggplot(data = df_heatmap, aes(x=position, y=new_index, fill=signal)) +
         geom_raster() +
         geom_vline(xintercept = c(left_limit, 0, right_limit)) +
         scale_fill_viridis(limits = c(NA, quantile(df$signal, 0.9)),
@@ -317,11 +322,6 @@ main = function(mnase_data, annotation, sample_list, som_width, som_height, left
     }
 }
 
-#NOTE: I set a random seed for the SOM training so we can reproduce the clusters, however the results
-# are more or less stable under repeated training runs with different random seeds. For many runs,
-# a third, very small cluster will be generated which has a strong positioning pattern, but this third
-# cluster can always be grouped into one of the primary clusters based on its phasing pattern.
-# I did not have the time or energy to figure out better clustering...
 main(mnase_data = snakemake@input[["mnase_data"]],
      annotation = snakemake@input[["annotation"]],
      sample_list = snakemake@params[["sample_list"]],
@@ -330,9 +330,10 @@ main(mnase_data = snakemake@input[["mnase_data"]],
      left_limit = snakemake@params[["left_limit"]],
      right_limit = snakemake@params[["right_limit"]],
      epochs = snakemake@params[["epochs"]],
-     n_clusters = 2,
+     n_clusters = 3,
      outputs = snakemake@output[["annotations"]],
-     seed = 755466,
+     meta_data_out = snakemake@output[["metagene_data"]],
+     seed = 1,
      loss_out = snakemake@output[["loss_plot"]],
      dendrogram_out = snakemake@output[["dendrogram"]],
      code_vector_plot_out = snakemake@output[["code_vectors"]],
@@ -341,3 +342,4 @@ main(mnase_data = snakemake@input[["mnase_data"]],
      data_by_cluster_plot_out = snakemake@output[["data_by_cluster"]],
      data_by_cluster_group_plot_out = snakemake@output[["data_by_cluster_group"]],
      heatmap_out = snakemake@output[["heatmap"]])
+

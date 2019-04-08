@@ -17,7 +17,8 @@ rule cluster_mnase_data:
         mnase_data = config["mnase_data"],
         annotation = config["annotation"],
     output:
-        annotations = expand("spt6-1004-37C-induced-intragenic-MNase-cluster-{x}.bed", x=[1,2]),
+        annotations = expand("spt6-1004-37C-induced-intragenic-MNase-cluster-{x}.bed", x=[1,2,3]),
+        metagene_data = "spt6-1004-37C-induced-intragenic-SOM-data.tsv.gz",
         loss_plot = "figures/som_loss-plot.svg",
         dendrogram = "figures/som_dendrogram.svg",
         code_vectors = "figures/som_code-vectors.svg",
@@ -31,7 +32,8 @@ rule cluster_mnase_data:
         left_limit = config["left_limit"],
         right_limit = config["right_limit"],
         epochs = config["epochs"]
-    conda: "envs/cluster_mnase.yaml"
+    conda:
+        "envs/cluster_mnase.yaml"
     script:
         "scripts/cluster_mnase.R"
 

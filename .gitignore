@@ -3,3 +3,5 @@ mogrify.log
 figures/
 *.bed
 Rplots.pdf
+*.*.swp
+*.tsv.gz
